@@ -31,7 +31,7 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello from Express')
 })
 
-app.get('/videos/:id', (req: Request, res: Response) => {
+app.get('/lesson_01/api/videos/:id', (req: Request, res: Response) => {
     const id = +req.params.id
     const video = videos.find(v => v.id === id)
     if (video) {
@@ -41,11 +41,11 @@ app.get('/videos/:id', (req: Request, res: Response) => {
     }
 })
 
-app.get('/videos', (req: Request, res: Response) => {
+app.get('/lesson_01/api/videos', (req: Request, res: Response) => {
     res.send(videos)
 })
 
-app.post('/videos/', (req: Request, res: Response) => {
+app.post('/lesson_01/api/videos/', (req: Request, res: Response) => {
     const title = req.body.title
     if (typeof title !== "string") {
         res.status(errorData.status).send(errorData)
@@ -64,7 +64,7 @@ app.post('/videos/', (req: Request, res: Response) => {
     }
 })
 
-app.put('/videos/:id', (req: Request, res: Response) => {
+app.put('/lesson_01/api/videos/:id', (req: Request, res: Response) => {
     const id = +req.params.id
     const video = videos.find(v => v.id === id)
     if (video) {
@@ -77,7 +77,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     }
 })
 
-app.delete('/videos/:id', (req: Request, res: Response) => {
+app.delete('/lesson_01/api/videos/:id', (req: Request, res: Response) => {
     const id = +req.params.id
     const video = videos.find(v => v.id === id)
     if (typeof video === "undefined") {
