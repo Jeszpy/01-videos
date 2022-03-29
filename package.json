@@ -4,7 +4,8 @@
   "main": "src/index.ts",
   "license": "MIT",
   "scripts": {
-    "start": "npx ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node src/index.js",
     "dev": "npx nodemon --inspect src/index.ts"
   },
   "dependencies": {
