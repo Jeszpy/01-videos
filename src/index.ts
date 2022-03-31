@@ -66,14 +66,17 @@ app.post('/lesson_01/api/videos/', (req: Request, res: Response) => {
 
 app.put('/lesson_01/api/videos/:id', (req: Request, res: Response) => {
     const id = +req.params.id
-    const video = videos.find(v => v.id === id)
-    if (video) {
-        video.title = req.body.title
-        // TODO: узнать точный адрес ответа
-        // res.status(204).send(video)
-        res.send(204)
-    } else {
+    const title = req.body.title
+    if (typeof title !== "string") {
         res.status(errorData.status).send(errorData)
+    } else {
+        const video = videos.find(v => v.id === id)
+        if (video) {
+            video.title = req.body.title
+            res.send(204)
+        } else {
+            res.status(404).send(errorData)
+        }
     }
 })
 
