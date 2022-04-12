@@ -1,7 +1,8 @@
 import {Request, Response, Router} from 'express'
-import {videosRepository} from "../repositories/videos-repository";
-import {body, param, query} from 'express-validator';
+// import {videosRepository} from "../repositories/videos-repository";
+import {videosRepository, VideoType} from "../repositories/mongo-videos-repository";
 import {inputValidatorMiddleware} from '../middlewares/input-validator-middleware'
+import {titleValidationParams} from "../common/validations/title-validation-params";
 
 const errorData = {
     type: 'error',
@@ -16,62 +17,55 @@ const errorData = {
 
 export const videosRouter = Router({})
 
-videosRouter.get('/:id', (req: Request, res: Response) => {
-    const id = +req.params.id
-    const video = videosRepository.getVideoById(id)
-    if (video) {
-        return res.send(video)
-    } else {
-        return res.send(404)
-    }
-})
-    .get('/', (req: Request, res: Response) => {
-        const videos = videosRepository.getVideos()
+videosRouter
+    .get('/:id', async (req: Request, res: Response) => {
+        const id = +req.params.id
+        const video = await videosRepository.getVideoById(id)
+        if (video) {
+            return res.send(video)
+        } else {
+            return res.send(404)
+        }
+    })
+    .get('/', async (req: Request, res: Response) => {
+        const videos = await videosRepository.getVideos()
         return res.send(videos)
     })
     .post('/',
-        body('title')
-            .isLength({min: 1, max: 100})
-            .isString()
-            .withMessage('string 1-100 symbols'),
-        // .matches(/^[\w ]*$/)
-        // .withMessage('input not valid'),
+        titleValidationParams,
         inputValidatorMiddleware,
-        (req: Request, res: Response) => {
+        async (req: Request, res: Response) => {
             const title = req.body.title
-            const newVideo = videosRepository.createVideo(title)
-            if (newVideo) {
-                return res.status(201).send(newVideo)
-            } else {
-                return res.status(errorData.status).send(errorData)
-            }
+            const newVideo: VideoType = await videosRepository.createVideo(title)
+            return res.status(201).send(newVideo)
         })
     .put('/:id',
-        body('title')
-            .isLength({min: 1, max: 100})
-            .isString()
-            .withMessage('string 1-100 symbols'),
+        titleValidationParams,
         inputValidatorMiddleware,
-        (req: Request, res: Response) => {
+        async (req: Request, res: Response) => {
             const id = +req.params.id
             const title = req.body.title
-            const isVideoUpdated = videosRepository.updateVideoById(id, title)
+            const isVideoUpdated = await videosRepository.updateVideoById(id, title)
             if (isVideoUpdated) {
                 return res.send(204)
             } else {
                 return res.status(404).send(errorData)
             }
         })
-    .delete('/:id', (req: Request, res: Response) => {
+    .delete('/:id', async (req: Request, res: Response) => {
         const id = +req.params.id
-        const video = videosRepository.getVideoById(id)
-        if (!video){
-            return res.status(404).send(errorData)
+        const isVideoDeleted = await videosRepository.deleteVideoById(id)
+        if (isVideoDeleted) {
+            return res.send(204)
         } else {
-            videosRepository.deleteVideoById(id)
-            const video = videosRepository.getVideoById(id)
-            if (!video) {
-                return res.send(204)
-            }
+            return res.status(404).send(errorData)
+        }
+    })
+    .delete('/', async (req: Request, res: Response) => {
+        const isVideosDeleted = await videosRepository.deleteAllVideos()
+        if (isVideosDeleted) {
+            return res.send(204)
+        } else {
+            return res.status(404).send(errorData)
         }
     })

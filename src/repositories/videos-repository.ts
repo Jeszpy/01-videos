@@ -1,7 +1,13 @@
 import {videosArray} from "./db";
 
+export type VideosType = {
+    id: number
+    title: string
+    author: string
+}
+
 export const videosRepository = {
-    getVideos() {
+    getVideos(): VideosType[] {
         return videosArray
     },
     getVideoById(id: number) {
